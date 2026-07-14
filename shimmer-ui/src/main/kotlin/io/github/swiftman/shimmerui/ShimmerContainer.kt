@@ -12,12 +12,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import io.github.swiftman.shimmerui.internal.LocalShimmerBaseColor
-import io.github.swiftman.shimmerui.internal.consumeAllPointerInput
 
 /**
  * Applies one synchronized shimmer sweep to an entire placeholder layout.
  *
- * Placeholder semantics and pointer interactions are disabled.
+ * Placeholder semantics are removed. Supplied placeholder content should be non-interactive.
  *
  * @param modifier modifier applied to the placeholder container;
  * @param configuration shimmer appearance and animation values;
@@ -35,7 +34,6 @@ public fun ShimmerContainer(
         Box(
             modifier = modifier
                 .shimmer(configuration)
-                .consumeAllPointerInput()
                 .clearAndSetSemantics { },
             content = content,
         )
