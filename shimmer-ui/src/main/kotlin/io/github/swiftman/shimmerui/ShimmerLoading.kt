@@ -86,25 +86,27 @@ public fun ShimmerLoading(
             content = content,
         )
 
-        CompositionLocalProvider(
-            LocalShimmerBaseColor provides configuration.baseColor,
-        ) {
-            Box(
-                modifier = Modifier
-                    .graphicsLayer {
-                        alpha = placeholderAlpha
-                        scaleX = placeholderScale
-                        scaleY = placeholderScale
-                    }
-                    .shimmer(
-                        configuration.active(
-                            configuration.isActive && isLoading,
+        if (isLoading || placeholderAlpha > 0f) {
+            CompositionLocalProvider(
+                LocalShimmerBaseColor provides configuration.baseColor,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            alpha = placeholderAlpha
+                            scaleX = placeholderScale
+                            scaleY = placeholderScale
+                        }
+                        .shimmer(
+                            configuration.active(
+                                configuration.isActive && isLoading,
+                            )
                         )
-                    )
-                    .consumeAllPointerInput()
-                    .clearAndSetSemantics { },
-                content = placeholder,
-            )
+                        .consumeAllPointerInput()
+                        .clearAndSetSemantics { },
+                    content = placeholder,
+                )
+            }
         }
     }
 }
