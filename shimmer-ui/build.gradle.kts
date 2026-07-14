@@ -12,7 +12,7 @@ version = providers.gradleProperty("VERSION_NAME").get()
 
 android {
     namespace = "io.github.swiftman.shimmerui"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 23
