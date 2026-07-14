@@ -16,6 +16,7 @@ android {
 
     defaultConfig {
         minSdk = 23
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -43,6 +44,13 @@ dependencies {
     implementation(libs.compose.animation)
 
     testImplementation(libs.junit)
+
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.compose.ui.test.junit4)
+
+    debugImplementation(libs.compose.ui.test.manifest)
 }
 
 dokka {
@@ -54,7 +62,12 @@ dokka {
         failOnWarning.set(true)
     }
 
-    dokkaSourceSets.named("main") {
+    dokkaSourceSets.register("main") {
+        sourceRoots.from(file("src/main/kotlin"))
+        classpath.from(
+            files(android.bootClasspath),
+            configurations.named("releaseCompileClasspath"),
+        )
         documentedVisibilities.set(setOf(VisibilityModifier.Public))
         reportUndocumented.set(true)
         skipEmptyPackages.set(true)
