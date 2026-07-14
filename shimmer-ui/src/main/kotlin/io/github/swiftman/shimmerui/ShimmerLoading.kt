@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.zIndex
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import io.github.swiftman.shimmerui.internal.LocalShimmerBaseColor
@@ -45,6 +50,16 @@ public fun ShimmerLoading(
         durationMillis = duration,
         easing = FastOutSlowInEasing,
     )
+    var isPlaceholderVisible by remember {
+        mutableStateOf(isLoading)
+    }
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            isPlaceholderVisible = true
+        }
+    }
+
     val contentAlpha by animateFloatAsState(
         targetValue = if (isLoading) 0f else 1f,
         animationSpec = animationSpec,
@@ -59,6 +74,11 @@ public fun ShimmerLoading(
         targetValue = if (isLoading) 1f else 0f,
         animationSpec = animationSpec,
         label = "Shimmer placeholder alpha",
+        finishedListener = { alpha ->
+            if (!isLoading && alpha == 0f) {
+                isPlaceholderVisible = false
+            }
+        },
     )
     val placeholderScale by animateFloatAsState(
         targetValue = if (isLoading) 1f else 0.995f,
@@ -67,31 +87,41 @@ public fun ShimmerLoading(
     )
 
     Box(modifier = modifier) {
-        val loadedContentModifier = Modifier.graphicsLayer {
-            alpha = contentAlpha
-            scaleX = contentScale
-            scaleY = contentScale
-        }.let { baseModifier ->
-            if (isLoading) {
-                baseModifier
-                    .consumeAllPointerInput()
-                    .clearAndSetSemantics { }
-            } else {
-                baseModifier
+        val loadedContentModifier = Modifier
+            .zIndex(if (isLoading) 0f else 1f)
+            .graphicsLayer {
+                alpha = contentAlpha
+                scaleX = contentScale
+                scaleY = contentScale
             }
-        }
+            .let { baseModifier ->
+                if (isLoading) {
+                    baseModifier
+                        .consumeAllPointerInput()
+                        .clearAndSetSemantics { }
+                } else {
+                    baseModifier
+                }
+            }
 
         Box(
             modifier = loadedContentModifier,
             content = content,
         )
 
-        if (isLoading || placeholderAlpha > 0f) {
+        if (isPlaceholderVisible) {
+            val placeholderInteractionModifier = if (isLoading) {
+                Modifier.consumeAllPointerInput()
+            } else {
+                Modifier
+            }
+
             CompositionLocalProvider(
                 LocalShimmerBaseColor provides configuration.baseColor,
             ) {
                 Box(
                     modifier = Modifier
+                        .zIndex(if (isLoading) 1f else 0f)
                         .graphicsLayer {
                             alpha = placeholderAlpha
                             scaleX = placeholderScale
@@ -102,7 +132,7 @@ public fun ShimmerLoading(
                                 configuration.isActive && isLoading,
                             )
                         )
-                        .consumeAllPointerInput()
+                        .then(placeholderInteractionModifier)
                         .clearAndSetSemantics { },
                     content = placeholder,
                 )
