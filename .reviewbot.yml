@@ -1,0 +1,19 @@
+version: 1
+
+review:
+  include:
+    - "**"
+
+  exclude:
+    - ".gradle/**"
+    - ".idea/**"
+    - "**/build/**"
+    - "gradle/wrapper/**"
+    - "docs/generated/**"
+    - "**/*.iml"
+
+  always_review:
+    - "shimmer-ui/src/main/**/*.kt"
+    - "shimmer-ui/src/test/**/*.kt"
+    - ".github/workflows/**"
+    - "**/*.gradle.kts"
