@@ -8,6 +8,8 @@ package io.github.swiftman.shimmerui
 import androidx.compose.ui.graphics.Color
 import io.github.swiftman.shimmerui.internal.ShimmerBandGeometry
 import io.github.swiftman.shimmerui.internal.ShimmerBandGradientProfile
+import io.github.swiftman.shimmerui.internal.angleDegrees
+import io.github.swiftman.shimmerui.internal.unitVector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -50,9 +52,47 @@ class ShimmerUITest {
     }
 
     @Test
-    fun directionContainsSixAbsoluteCases() {
-        assertEquals(6, ShimmerDirection.entries.size)
+    fun directionsMapToExpectedVectorsAndAngles() {
+        data class Expectation(
+            val direction: ShimmerDirection,
+            val x: Float,
+            val y: Float,
+            val angleDegrees: Float,
+        )
+
+        val expectations = listOf(
+            Expectation(ShimmerDirection.LeftToRight, 1f, 0f, 0f),
+            Expectation(ShimmerDirection.RightToLeft, -1f, 0f, 180f),
+            Expectation(ShimmerDirection.TopToBottom, 0f, 1f, 90f),
+            Expectation(ShimmerDirection.BottomToTop, 0f, -1f, -90f),
+            Expectation(
+                ShimmerDirection.TopLeftToBottomRight,
+                0.70710678f,
+                0.70710678f,
+                45f,
+            ),
+            Expectation(
+                ShimmerDirection.BottomRightToTopLeft,
+                -0.70710678f,
+                -0.70710678f,
+                -135f,
+            ),
+        )
+
+        assertEquals(ShimmerDirection.entries.size, expectations.size)
         assertEquals("Left → Right", ShimmerDirection.LeftToRight.title)
+
+        expectations.forEach { expectation ->
+            val vector = expectation.direction.unitVector
+
+            assertEquals(expectation.x, vector.x, 0.0001f)
+            assertEquals(expectation.y, vector.y, 0.0001f)
+            assertEquals(
+                expectation.angleDegrees,
+                expectation.direction.angleDegrees,
+                0.0001f,
+            )
+        }
     }
 
     @Test
