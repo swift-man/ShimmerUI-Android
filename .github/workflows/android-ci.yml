@@ -44,6 +44,7 @@ jobs:
           ./gradlew \
             :shimmer-ui:lintDebug \
             :shimmer-ui:testDebugUnitTest \
+            :shimmer-ui:assembleDebugAndroidTest \
             :shimmer-ui:dokkaGeneratePublicationHtml \
             :sample:assembleDebug \
             --stacktrace
