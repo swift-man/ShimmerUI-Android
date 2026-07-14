@@ -12,6 +12,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -55,11 +56,17 @@ public fun Modifier.shimmer(
         label = "Shimmer progress",
     )
 
-    val vector = configuration.direction.unitVector
-    val angleDegrees = configuration.direction.angleDegrees
-    val gradientStops = ShimmerBandGradientProfile.colorStops(
-        highlightColor = configuration.highlightColor,
-    )
+    val vector = remember(configuration.direction) {
+        configuration.direction.unitVector
+    }
+    val angleDegrees = remember(configuration.direction) {
+        configuration.direction.angleDegrees
+    }
+    val gradientStops = remember(configuration.highlightColor) {
+        ShimmerBandGradientProfile.colorStops(
+            highlightColor = configuration.highlightColor,
+        )
+    }
 
     return graphicsLayer {
         compositingStrategy = CompositingStrategy.Offscreen
